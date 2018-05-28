@@ -214,9 +214,9 @@ Generate a config file for credentials
 Transfer to client system
   • use pscp, SFTP, filezilla or WinSCP
 *Needs OpenVPN install in Windows or Linux
-  • windows:
+  • Windows:
     o copy the file to c:\Program Files\OpenVPN\config
-  • linux:
+  • Linux:
     o pscp file from server to client
     o run openvpn client1.ovpn
 

@@ -5,143 +5,144 @@ Author: Saulo S. Ortiz
 Date: 20170417
 
 Update and Install openvpn and easy-rsa
-•	sudo apt-get update
-•	sudo apt-get install openvpn easy-rsa
+  • sudo apt-get update
+  • sudo apt-get install openvpn easy-rsa
 
 Copy template dir into home dir
-•	make-cadir ~/openvpn-ca
+  • make-cadir ~/openvpn-ca
 
 Go into dir
-•	cd ~/openvpn-ca
+  • cd ~/openvpn-ca
 
 Configure CA Variables
-•	nano vars
-•	scroll to bottom
-•	change ID info (optional)
-•	Look for KEY_NAME
-o	enter KEY_NAME=“server”
-•	ctrl-x, y, enter
+  • nano vars
+  • scroll to bottom
+  • change ID info (optional)
+  • Look for KEY_NAME
+    o enter KEY_NAME=“server”
+  • ctrl-x, y, enter
 
 Build certificate authority
-•	cd ~/openvpn-ca
-•	source vars
-•	clean environment
-o	./clean-all
-•	build root CA
-o	/build-ca
-•	press enter all through prompts
+  • cd ~/openvpn-ca
+  • source vars
+  • clean environment
+    o ./clean-all
+  • build root CA
+    o /build-ca
+  • press enter all through prompts
 
 Create server certificate, key pair and encryption files
 *if you chose a name other name “server” during configure CA above you will have to adjust some instructions below, the server.conf, .crt and .key files.
-•	./build-key-server server
-o	accept the default values and DO NOT enter the challenge password
-o	enter “y” on the next two questions
+  • ./build-key-server server
+    o accept the default values and DO NOT enter the challenge password
+    o enter “y” on the next two questions
 
 Generate Diffie-Hellman keys
-•	./build-dh
+  • ./build-dh
 
 Generate HMAC signature to strengthen the server’s TLS integrity verification
-•	openvpn –-genkey –-secret keys/ta.key
+  • openvpn –-genkey –-secret keys/ta.key
 
 Generate client certificate and key pair
 	*to produce credentials without a password:
-•	cd ~/openvpn-ca
-•	source vars
-•	./build-key client1
-o	accept the default values and DO NOT enter the challenge password
-o	enter “y” on the next two questions
+  • cd ~/openvpn-ca
+  • source vars
+  • ./build-key client1
+    o accept the default values and DO NOT enter the challenge password
+    o enter “y” on the next two questions
+
 *to produce password-protected credentials:
-•	cd ~/openvpn-ca
-•	source vars
-•	./build-key-pass client1
-o	accept the default values and DO NOT enter the challenge password
-o	enter “y” on the next two questions
+  • cd ~/openvpn-ca
+  • source vars
+  • ./build-key-pass client1
+    o accept the default values and DO NOT enter the challenge password
+    o enter “y” on the next two questions
 
 Copy files to OpenVPN dir
-•	cd ~/openvpn-ca/keys
-•	sudo cp ca.crt ca.key server.crt server.key ta.key dh2048.pem /etc/openvpn
+  • cd ~/openvpn-ca/keys
+  • sudo cp ca.crt ca.key server.crt server.key ta.key dh2048.pem /etc/openvpn
 
 Copy and unzip a sample config file into config dir
-•	gunzip –c /usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz | sudo tee /etc/openvpn/server.conf
-
+  • gunzip –c /usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz | sudo tee /etc/openvpn/server.conf
 
 Modify server conf file
-•	sudo nano /etc/openvpn/server.conf
-•	find tls-auth using ctrl+w
-o	remove “;”
-o	below add key-direction 0
-•	find cipher using ctrl-w
-o	remove “;” from cipher AES-128-CBC
-o	below add auth SHA256
-•	find user nobody using ctrl-w
-o	remove “;” from both user and group nobody
-•	Push DNS changes to redirect all traffic through VPN
-•	find push “redirect-gateway def1 bypass-dhcp”
-o	remove “;”
-•	below find dhcp-option and remove “;” from both lines
+  • sudo nano /etc/openvpn/server.conf
+  • find tls-auth using ctrl+w
+    o remove “;”
+    o below add key-direction 0
+  • find cipher using ctrl-w
+    o remove “;” from cipher AES-128-CBC
+    o below add auth SHA256
+  • find user nobody using ctrl-w
+    o remove “;” from both user and group nobody
+  • Push DNS changes to redirect all traffic through VPN
+  • find push “redirect-gateway def1 bypass-dhcp”
+    o remove “;”
+  • below find dhcp-option and remove “;” from both lines
+
 *this assist clients in reconfiguring their DNS settings to use the VPN tunnel as the default gateway
 
 (optional) modify port and protocol
-	*the default port is 1194 for UDP and 443 for TCP
-•	sudo nano /etc/openvpn/server.conf
-•	find proto using ctrl-w
-•	change port number
-•	change proto to tcp if using port 443
+*the default port is 1194 for UDP and 443 for TCP
+  • sudo nano /etc/openvpn/server.conf
+  • find proto using ctrl-w
+  • change port number
+  • change proto to tcp if using port 443
 
 (optional) point to non-default credentials
 *if you selected a different name for the server other than the default during the ./build-key-server, modify the cert and key lines
-•	sudo /etc/openvpn/server.conf
-•	sudo mv cert server.crt cert yourname.crt
-•	sudo mv key server.key key yourname.key
+  • sudo /etc/openvpn/server.conf
+  • sudo mv cert server.crt cert yourname.crt
+  • sudo mv key server.key key yourname.key
 
 Allow IP forwarding
-•	sudo nano /etc/sysctl.conf
-•	find net.ipv4 using ctrl-w
-o	remove # from # net.ipv4.ip_forward=1
-•	ctrl-x, y, enter
-•	read the file and adjust the values for the session
-o	sudo sysctl –p
+  • sudo nano /etc/sysctl.conf
+  • find net.ipv4 using ctrl-w
+    o remove # from # net.ipv4.ip_forward=1
+  • ctrl-x, y, enter
+  • read the file and adjust the values for the session
+      o sudo sysctl –p
 
 Modify UFW firewall rules to masquerade connections
 *your public interface is after “dev”
-o	ex. default via ###.#.#.# dev eth0…
-•	sudo apt-get install ufw –y
-•	find public network interface
-o	ip route | grep default
+    o ex. default via ###.#.#.# dev eth0…
+  • sudo apt-get install ufw –y
+  • find public network interface
+    o ip route | grep default
 
 Set the default policy for POSTROUTING in the NAT table and masquerades any traffic coming from the VPN
-•	sudo nano /etc/ufw/before.rules
-•	enter new line below # ufw-before-forward:
-o	# START OPENVPN RULES
-o	# NAT table rules
-o	*nat
-o	:POSTROUTING ACCEPT [0:0]
-o	# Allow traffic from OpenVPN client to eth0
-o	–A POSTROUTING –s 10.8.0.0/8 –o eth0 –j MASQUERADE
-o	COMMIT
-o	# END OPENVPN RULES
+  • sudo nano /etc/ufw/before.rules
+  • enter new line below # ufw-before-forward:
+    o # START OPENVPN RULES
+    o # NAT table rules
+    o *nat
+    o :POSTROUTING ACCEPT [0:0]
+    o # Allow traffic from OpenVPN client to eth0
+    o –A POSTROUTING –s 10.8.0.0/8 –o eth0 –j MASQUERADE
+    o COMMIT
+    o # END OPENVPN RULES
 
-*remember to replace eth0 in the –A POSTROUTING with the interface you found after “dev”
+*Remember to replace eth0 in the –A POSTROUTING with the interface you found after “dev”
 
 Allow UFW to forward packages by default
-•	sudo nano /etc/default/ufw
-•	find DEFAULT_FORWARD_POLICY using ctrl-w
-•	change “DROP” to “ACCEPT”
-o	DEFAULT_FORWARD_POLICY=”ACCEPT”
-•	ctrl-x, y, enter
+  • sudo nano /etc/default/ufw
+  • find DEFAULT_FORWARD_POLICY using ctrl-w
+  • change “DROP” to “ACCEPT”
+    o DEFAULT_FORWARD_POLICY=”ACCEPT”
+  • ctrl-x, y, enter
 
 Change UFW ports
-•	sudo ufw enable
-•	sudo ufw allow 1194/udp
-•	sudo ufw allow OpenSSH
-•	sudo ufw disable
-•	sudo ufw enable
+  • sudo ufw enable
+  • sudo ufw allow 1194/udp
+  • sudo ufw allow OpenSSH
+  • sudo ufw disable
+  • sudo ufw enable
 
 Start OpenVPN
 *configuration file is called server.conf unless named otherwise
-•	sudo systemctl start openvpn@server
-•	check status
-o	sudo systemctl status openvpn@server
+  • sudo systemctl start openvpn@server
+  • check status
+    o sudo systemctl status openvpn@server
 o	look for Active: active (running)…
 •	check OpenVPN tun0 interface is running
 o	ip addr show tun0

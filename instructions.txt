@@ -32,7 +32,7 @@ Build certificate authority
   • press enter all through prompts
 
 Create server certificate, key pair and encryption files
-*if you chose a name other name “server” during configure CA above you will have to adjust some instructions below, the server.conf, .crt and .key files.
+*If you chose a name other name “server” during configure CA above you will have to adjust some instructions below, the server.conf, .crt and .key files.
   • ./build-key-server server
     o accept the default values and DO NOT enter the challenge password
     o enter “y” on the next two questions
@@ -44,14 +44,14 @@ Generate HMAC signature to strengthen the server’s TLS integrity verification
   • openvpn –-genkey –-secret keys/ta.key
 
 Generate client certificate and key pair
-	*to produce credentials without a password:
+*To produce credentials without a password:
   • cd ~/openvpn-ca
   • source vars
   • ./build-key client1
     o accept the default values and DO NOT enter the challenge password
     o enter “y” on the next two questions
 
-*to produce password-protected credentials:
+*To produce password-protected credentials:
   • cd ~/openvpn-ca
   • source vars
   • ./build-key-pass client1
@@ -80,17 +80,17 @@ Modify server conf file
     o remove “;”
   • below find dhcp-option and remove “;” from both lines
 
-*this assist clients in reconfiguring their DNS settings to use the VPN tunnel as the default gateway
+*This assist clients in reconfiguring their DNS settings to use the VPN tunnel as the default gateway
 
 (optional) modify port and protocol
-*the default port is 1194 for UDP and 443 for TCP
+*The default port is 1194 for UDP and 443 for TCP
   • sudo nano /etc/openvpn/server.conf
   • find proto using ctrl-w
   • change port number
   • change proto to tcp if using port 443
 
 (optional) point to non-default credentials
-*if you selected a different name for the server other than the default during the ./build-key-server, modify the cert and key lines
+*If you selected a different name for the server other than the default during the ./build-key-server, modify the cert and key lines
   • sudo /etc/openvpn/server.conf
   • sudo mv cert server.crt cert yourname.crt
   • sudo mv key server.key key yourname.key
@@ -104,7 +104,7 @@ Allow IP forwarding
       o sudo sysctl –p
 
 Modify UFW firewall rules to masquerade connections
-*your public interface is after “dev”
+*Your public interface is after “dev”
     o ex. default via ###.#.#.# dev eth0…
   • sudo apt-get install ufw –y
   • find public network interface
@@ -139,123 +139,123 @@ Change UFW ports
   • sudo ufw enable
 
 Start OpenVPN
-*configuration file is called server.conf unless named otherwise
+*Configuration file is called server.conf unless named otherwise
   • sudo systemctl start openvpn@server
   • check status
     o sudo systemctl status openvpn@server
-o	look for Active: active (running)…
-•	check OpenVPN tun0 interface is running
-o	ip addr show tun0
-•	enable service to auto start at bootup
-o	sudo systemctl enable openvpn@server
+    o look for Active: active (running)…
+  • check OpenVPN tun0 interface is running
+    o ip addr show tun0
+  • enable service to auto start at bootup
+    o sudo systemctl enable openvpn@server
 
 Creating a client config dir structure
-•	mkdir –p ~/client-configs/files
-•	lock down permissions to inner dir
-o	chmod 700 ~/client-configs/files
-•	copy client example client config in dir
-o	cp /usr/share/doc/openvpn/examples/sample-config-files/client.conf ~/client-configs/base.conf
+  • mkdir –p ~/client-configs/files
+  • lock down permissions to inner dir
+    o chmod 700 ~/client-configs/files
+  • copy client example client config in dir
+    o cp /usr/share/doc/openvpn/examples/sample-config-files/client.conf ~/client-configs/base.conf
 
 Point the clients to the OpenVPN server address
-•	sudo nano ~/client-configs/base.conf
-•	find “remote” using ctrl-w
-o	remote server_IP_address 1194
-o	proto udp
-*if you changed the port you need to change it here
-•	find user and group and remove “;”
-•	find ca, cert and key and remove “#” from each line
-o	ca ca.crt
-o	cert client.crt
-o	key client.key
-•	mirror cipher and auth settings from server.conf file
-o	cipher AES-128-CBC
-o	auth SHA256
-•	add key-direction anywhere in the file
-o	key-direction 1
-•	add the following commented out lines for Linux clients only that ship with /etc/openvpn/update-resolv-conf file
-o	# script-security 2
-o	# up /etc/openvpn/update-resolv-conf
-o	# down /etc/openvpn/update-resolv-conf
-•	Ctrl-x, y, enter
+  • sudo nano ~/client-configs/base.conf
+  • find “remote” using ctrl-w
+    o remote server_IP_address 1194
+    o proto udp
+*If you changed the port you need to change it here
+  • find user and group and remove “;”
+  • find ca, cert and key and remove “#” from each line
+    o ca ca.crt
+    o cert client.crt
+    o key client.key
+  • mirror cipher and auth settings from server.conf file
+    o cipher AES-128-CBC
+    o auth SHA256
+  • add key-direction anywhere in the file
+    o key-direction 1
+  • add the following commented out lines for Linux clients only that ship with /etc/openvpn/update-resolv-conf file
+    o # script-security 2
+    o # up /etc/openvpn/update-resolv-conf
+    o # down /etc/openvpn/update-resolv-conf
+  • Ctrl-x, y, enter
 
 Create a simple script to compile the base config with the cert, key and encryption files
-•	create and open config.sh
-o	cd ~/client-configs
-o	sudo nano ~/client-configs/make_config.sh
-•	copy and paste from below
-o	#!/bin/bash
-o
-o	# First argument: Client identifier
-o
-o	KEY_DIR=~/openvpn-ca/keys
-o	OUTPUT_DIR=~/client-configs/files
-o	BASE_CONFIG=~/client-configs/base.conf
-o
-o	cat ${BASE_CONFIG} \
-o	    <(echo -e '<ca>') \
-o	    ${KEY_DIR}/ca.crt \
-o	    <(echo -e '</ca>\n<cert>') \
-o	    ${KEY_DIR}/${1}.crt \
-o	    <(echo -e '</cert>\n<key>') \
-o	    ${KEY_DIR}/${1}.key \
-o	    <(echo -e '</key>\n<tls-auth>') \
-o	    ${KEY_DIR}/ta.key \
-o	    <(echo -e '</tls-auth>') \
-o	    > ${OUTPUT_DIR}/${1}.ovpn
-•	ctrl-x, y, enter
-•	mark the file as executable
-o	sudo chmod 700 ~/client-configs/make_config.sh
+  • create and open config.sh
+    o cd ~/client-configs
+    o sudo nano ~/client-configs/make_config.sh
+  • copy and paste from below
+    o #!/bin/bash
+    o
+    o # First argument: Client identifier
+    o
+    o KEY_DIR=~/openvpn-ca/keys
+    o OUTPUT_DIR=~/client-configs/files
+    o BASE_CONFIG=~/client-configs/base.conf
+    o
+    o cat ${BASE_CONFIG} \
+    o <(echo -e '<ca>') \
+    o ${KEY_DIR}/ca.crt \
+    o <(echo -e '</ca>\n<cert>') \
+    o ${KEY_DIR}/${1}.crt \
+    o <(echo -e '</cert>\n<key>') \
+    o ${KEY_DIR}/${1}.key \
+    o <(echo -e '</key>\n<tls-auth>') \
+    o ${KEY_DIR}/ta.key \
+    o <(echo -e '</tls-auth>') \
+    o > ${OUTPUT_DIR}/${1}.ovpn
+  • ctrl-x, y, enter
+  • mark the file as executable
+    o sudo chmod 700 ~/client-configs/make_config.sh
 
 Generate a config file for credentials
-•	cd ~/client-configs
-•	./make_config.sh client1
-•	Verify you have client1.ovpn file
+  • cd ~/client-configs
+  • ./make_config.sh client1
+  • Verify you have client1.ovpn file
 
 Transfer to client system
-•	use pscp, SFTP, filezilla or WinSCP
-*needs OpenVPN install in Windows or Linux
-•	windows:
-o	copy the file to c:\Program Files\OpenVPN\config
-•	linux:
-o	pscp file from server to client
-o	run openvpn client1.ovpn
+  • use pscp, SFTP, filezilla or WinSCP
+*Needs OpenVPN install in Windows or Linux
+  • windows:
+    o copy the file to c:\Program Files\OpenVPN\config
+  • linux:
+    o pscp file from server to client
+    o run openvpn client1.ovpn
 
 Edit .ovpn file
-*uncomment lines in .ovpn file only if you found an update-resolv-conf file in client system
-•	ls /etc/openvpn
-o	output: update-resolv-conf
-•	sudo nano client1.ovpn
-•	uncomment:
-o	script-security 2
-o	up /etc/openvpn/update-resolv-conf
-o	down /etc/openvpn/update-resolv-conf
+*Uncomment lines in .ovpn file only if you found an update-resolv-conf file in client system
+  • ls /etc/openvpn
+    o output: update-resolv-conf
+  • sudo nano client1.ovpn
+  • uncomment:
+    o script-security 2
+    o up /etc/openvpn/update-resolv-conf
+    o down /etc/openvpn/update-resolv-conf
 
 Test VPN connection
-•	without VPN open go to www.dnsleaktest.com
-o	site will return the IP assigned by your ISP which is what you appear to the rest of the world
-o	check DNS using extended test and will tell you the DNS servers you’re are using
-•	connect OpenVPN and refresh the browser
-o	you should have a different IP address
-o	check DNS using extended test and will tell you the DNS servers you’re are using
+  • without VPN open go to www.dnsleaktest.com
+    o site will return the IP assigned by your ISP which is what you appear to the rest of the world
+    o check DNS using extended test and will tell you the DNS servers you’re are using
+  • connect OpenVPN and refresh the browser
+    o you should have a different IP address
+    o check DNS using extended test and will tell you the DNS servers you’re are using
 
 Revoking client certs
-•	cd ~/openvpn-ca
-•	source vars
-•	./revoke-full client1
-o	error 23 is normal
-o	file crl.pem was generated in /keys
+  • cd ~/openvpn-ca
+  • source vars
+  • ./revoke-full client1
+    o error 23 is normal
+    o file crl.pem was generated in /keys
 
 Transfer .pem file
-•	sudo cp ~/openvpn-ca/keys/crl.pem /etc/openvpn
-•	sudo nano /etc/openvpn/server.conf
-o	at the bottom add:
-o	crl-verify crl.pem
-•	ctrl-x, y, enter
+  • sudo cp ~/openvpn-ca/keys/crl.pem /etc/openvpn
+  • sudo nano /etc/openvpn/server.conf
+    o at the bottom add:
+    o crl-verify crl.pem
+  • ctrl-x, y, enter
 
 Restart OpenVPN
-•	sudo systemctl restart openvpn@server
+  • sudo systemctl restart openvpn@server
 
 To revoke additional clients, follow this process:
-•	Generate a new certificate revocation list by sourcing the vars file in the ~/openvpn-ca directory and then calling the revoke-full script on the client name
-•	Copy the new certificate revocation list to the /etc/openvpn directory to overwrite the old list
-•	Restart the OpenVPN service.
+  • Generate a new certificate revocation list by sourcing the vars file in the ~/openvpn-ca directory and then calling the revoke-full script on the client name
+  • Copy the new certificate revocation list to the /etc/openvpn directory to overwrite the old list
+  • Restart the OpenVPN service.

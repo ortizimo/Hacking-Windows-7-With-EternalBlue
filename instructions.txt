@@ -1,9 +1,10 @@
-********************************************************
+﻿********************************************************
+Straightforward Training™
 Raspberry Pi OpenVPN Setup
-********************************************************
 Author: Saulo S. Ortiz
 Date: 20170417
 Update: 20180528
+********************************************************
 
 Update and Install openvpn and easy-rsa
   • sudo apt-get update

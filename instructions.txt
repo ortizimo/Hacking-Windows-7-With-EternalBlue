@@ -30,8 +30,8 @@ DEFAULT LOGINS:
   • Kali: root/toor
 
 WHAT YOU’LL NEED FOR THIS EXERCISE:
-  • A computer with minimum: 8GB RAM, 6 Core CPU and a HDD of 500GB (16GB best)
-  • ISO file of Windows 7
+  • A host computer with minimum: 8GB RAM (16GB or more better), 6 Core CPU (8 Core or more better) and a HDD of 500GB
+  • ISO file of Windows 7 (Stop Windows updates)
   • ISO file of the latest Kali release (BIG)
   • OracleVirtualbox (free) or VMWare Workstation 12 or higher
 
@@ -185,5 +185,5 @@ NOTE: Several things here...
   b. You cannot change the entire MACE as this will give you away to the admins
 ******************************************************************************
 
-8. I did not included it in this guide, but if you want to clear the Event Logs to hide your trace then use the 
+8. I did not included it in this guide, but if you want to clear the Event Logs to hide your trace then use the
 Maintain Persistence to Windows XP to learn to how.

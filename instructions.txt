@@ -20,11 +20,11 @@ these steps in this short guide. This guide is NOT for people that have no idea 
 configure Linux/Windows O/S or VMs. Google is your best friend and research is part of the job.
 
 COMMONS COMMANDS TO KNOW:
-  • ls		     - Lists Files (LS)
-  • pwd		     - Prints the current path to screen
-  • cd		     - Call Directory
-  • ifconfig	 - Displays local network information
-  • shell      - Opens Windows CMD prompt
+  • ls		    - Lists Files (LS)
+  • pwd		    - Prints the current path to screen
+  • cd		    - Call Directory
+  • ifconfig  - Displays local network information
+  • shell     - Opens Windows CMD prompt
 
 DEFAULT LOGINS:
   • Kali: root/toor

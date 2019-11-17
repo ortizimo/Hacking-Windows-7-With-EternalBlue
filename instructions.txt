@@ -184,3 +184,6 @@ NOTE: Several things here...
   a. You can use / in meterpreter and \ in shell for your paths in Windows
   b. You cannot change the entire MACE as this will give you away to the admins
 ******************************************************************************
+
+8. I did not included it in this guide, but if you want you can go and clear the Event Logs
+to hide any trace of your acts use the Maintain Persistence to Windows XP to learn to how. 

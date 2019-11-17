@@ -184,31 +184,3 @@ NOTE: Several things here...
   a. You can use / in meterpreter and \ in shell for your paths in Windows
   b. You cannot change the entire MACE as this will give you away to the admins
 ******************************************************************************
-
-8. Find the correct session ID for this attack…
-  a. Type: sessions
-  b. Type: sessions –i <#>
-    i. Replace the <#> with the correct number for the session
-
-******************************************************************************
-NOTE: You’re back in meterpreter!
-******************************************************************************
-
-9. Upload the file back to the target…
-  a. Type: upload hacked.txt
-
-10. Get a GUI of the target machine…
-  a. Type: run vnc
-    i.	Wait a few seconds for this to work…if it doesn’t then there might be something blocking the connection.
-
-******************************************************************************
-NOTE: With this VNC connection you can control the mouse; it’s just a viewing option so you can see what
-the user is actually doing.
-******************************************************************************
-
-11. Go into Events in Windows and look at all the logs
-
-12. STOP! Instead of clearing the logs now we will move on to make a new user to maintain persistence. But in case you
-were curious, the command to clear the logs is:
-  a. Type: clearev
-    i. This will erase all logs and can alert the admin that someone was in the system…

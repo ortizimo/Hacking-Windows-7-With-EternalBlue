@@ -62,9 +62,9 @@ WINDOWS 7 SETUP:
   b. Copy that file and make 2 more copies
   c. Rename them text2 and text3.txt
 
-First we need to turn OFF the Firewall...I know what you’re thinking, but it needs to happen so you can see the results. Bypassing
-the Firewall is for another guide. Then, we need to turn ON the Audit Logon Event that will recognize when someone else is in the
-system. This is off by default. This option and many more will be ON if an administrator is good at their job.
+First we need to turn OFF the Firewall...I know what you’re thinking, but it needs to happen so you can see the results.
+Bypassing the Firewall is for another guide. Then, we need to turn ON the Audit Logon Event that will recognize when someone
+else is in the system. This is off by default. This option and many more will be ON if an administrator is good at their job.
 
 The next thing we need to change is to allow users to connect remotely to this computer. And lastly we need to change the way
 the users log on to the system.

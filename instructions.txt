@@ -30,8 +30,8 @@ DEFAULT LOGINS:
   • Kali: root/toor
 
 WHAT YOU’LL NEED FOR THIS EXERCISE:
-  • A host computer with minimum: 8GB RAM (16GB or more better), 6 Core CPU (8 Core or more better) and a HDD of 500GB
-  • ISO file of Windows 7 (Stop Windows updates)
+  • A host computer with minimum: 8GB RAM (16GB or more better), 6 Core CPU (8 Core or more better) and 500GB HDD (SSD/M.2)
+  • ISO file of Windows 7 (Stop Windows updates!!!)
   • ISO file of the latest Kali release (BIG)
   • OracleVirtualbox (free) or VMWare Workstation 12 or higher
 
@@ -57,9 +57,9 @@ WINDOWS 7 SETUP:
 1. Go to the target and on the Desktop create a folder named My Files.
 
 2. Open the folder and right click in it. From the menu select New > Text Document
-	a. Insert a blank text file
-	b. Copy that file and make 2 more copies
-	c. Rename them text2 and text3.txt
+  a. Insert a blank text file
+  b. Copy that file and make 2 more copies
+  c. Rename them text2 and text3.txt
 
 First we need to turn OFF the Firewall…I know what you’re thinking, but it needs to happen. Then, we need to turn ON the Audit
 Logon Event that will recognize when someone else is in the system. This is off by default. This option and many more will be

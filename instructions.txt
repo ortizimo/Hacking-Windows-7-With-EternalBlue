@@ -3,7 +3,7 @@ Straightforward Training™
 Hacking Windows 7 with EternalBlue
 Author: Saulo S. Ortiz
 Date: 20191115
-Update: 20191117
+Update: 20191127
 **********************************************
 
 DISCLAIMER
@@ -201,4 +201,4 @@ Maintain Persistence to Windows XP to learn to how.
   a. Type: clearev
     i. This will erase all logs and can alert the admin that someone was in the system…
 
-16. Go into Events in Windows and look at all the logs
+16. Go into Events in Windows and look at the logs.
